@@ -29,16 +29,6 @@ async def set_user(session, tg_id: int) -> Optional[User]:
         await session.rollback()
 
 
-from pstats import Stats
-from create_bot import logger
-from .base import connection
-from .models import User
-from sqlalchemy import inspect, select, update
-from typing import List, Dict, Any, Optional
-from sqlalchemy import func
-from sqlalchemy.orm import selectinload
-from sqlalchemy.exc import SQLAlchemyError
-from uuid import UUID
 
 
 @connection
@@ -58,3 +48,62 @@ async def set_group(session, group_id: int) -> Optional[User]:
     except SQLAlchemyError as e:
         logger.error(f"Ошибка при добавлении группы: {e}")
         await session.rollback()
+
+
+@connection
+async def set_group(session, group_id: int) -> Optional[User]:
+    try:
+        group = await session.scalar(select(Group).filter_by(group_id=group_id))
+
+        if not group:
+            new_group = Group(group_id=group_id)
+            session.add(new_group)
+            await session.commit()
+            logger.info(f"Зарегистрировал  группу с ID {group_id}!")
+            return None
+        else:
+            logger.info(f"Группы с ID {group_id} найденв!")
+            return group
+    except SQLAlchemyError as e:
+        logger.error(f"Ошибка при добавлении группы: {e}")
+        await session.rollback()
+
+@connection
+async def get_groups(session) -> List[Dict[str, Any]]:
+    try:
+        result = await session.execute(select(Group).filter_by())
+        groups = result.scalars().all()
+
+        if not groups:
+            logger.info(f"Группы не найдены.")
+            return []
+
+        grpup_list = [
+            {
+                'id': group.id,
+                'group_id': group.group_id,
+            } for group in groups
+        ]
+
+        return grpup_list
+    except SQLAlchemyError as e:
+        logger.error(f"Ошибка при получении групп: {e}")
+        return []
+    
+
+@connection
+async def delete_group(session, group_id) -> Optional[Group]:
+    try:
+        group = await session.scalar(select(Group).filter_by(group_id=group_id))
+        if not group:
+            logger.error(f"Группа с ID {group_id} не найдена.")
+            return None
+
+        await session.delete(group)
+        await session.commit()
+        logger.info(f"Группа с ID {group_id} успешно удалена.")
+        return group
+    except SQLAlchemyError as e:
+        logger.error(f"Ошибка при удалении группв: {e}")
+        await session.rollback()
+        return None
