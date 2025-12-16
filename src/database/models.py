@@ -20,4 +20,6 @@ class Group(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
     group_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    
+    thread_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
 

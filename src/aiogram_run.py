@@ -2,8 +2,9 @@ import asyncio
 from create_bot import bot, dp, admins
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
+from database.base import create_tables
 from handlers.start_router import start_router
-
+from handlers.add_topic_router import add_topic_router
 
 # Функция, которая настроит командное меню (дефолтное для всех пользователей)
 async def set_commands():
@@ -14,6 +15,7 @@ async def set_commands():
 # Функция, которая выполнится когда бот запустится
 async def start_bot():
     await set_commands()
+    await create_tables()
     for admin_id in admins:
         try:
             await bot.send_message(admin_id, f'Я запущен🥳.')
@@ -33,7 +35,7 @@ async def stop_bot():
 async def main():
     # регистрация роутеров
     dp.include_router(start_router)
-
+    dp.include_router(add_topic_router)
     # регистрация функций
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
