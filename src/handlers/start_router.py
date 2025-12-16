@@ -165,7 +165,8 @@ async def on_user_shared(message:Message, state: FSMContext):
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = message.text
-    content = f"Туки-Туки. Пришла анонимка.\n<b>Кому</b>: {data["username"]}\n<b>Текст</b>\n{congratulation}"
+    username = data["username"]
+    content = f"Туки-Туки. Пришла анонимка.\n<b>Кому</b>: {username}\n<b>Текст</b>\n{congratulation}"
     await bot.send_message(
             chat_id=data["group_id"],
             message_thread_id=data["thread_id"],
