@@ -2,7 +2,7 @@ import asyncio
 from create_bot import bot, dp, admins
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from start_router import start_router
+from handlers.start_router import start_router
 
 
 # Функция, которая настроит командное меню (дефолтное для всех пользователей)
