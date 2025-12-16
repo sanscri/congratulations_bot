@@ -184,9 +184,10 @@ async def handle_user_note_message(message: Message, state: FSMContext):
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = message.text
+    chat_id = data["user_id"]
     try:
         await bot.send_message(
-            chat_id=data["user_id"],
+            chat_id=chat_id,
             text=congratulation,
             parse_mode=ParseMode.HTML,
             reply_markup=main_kb()
@@ -194,10 +195,10 @@ async def handle_user_note_message(message: Message, state: FSMContext):
         success_content = "Анонимка отрпавлена"
         await message.answer(success_content, reply_markup=main_kb())
     except TelegramBadRequest:
-        logger.error(f"Не получилось отправить сообщение пользователю {data["user_id"]}")
+        logger.error(f"Не получилось отправить сообщение пользователю {chat_id}")
         await message.answer("Не получилось отрпавить сообщение пользователю. Возможно пользователя нет в боте.")
     except TelegramForbiddenError:
-        logger.error(f"Не получилось отправить сообщение пользователю {data["user_id"]}")
+        logger.error(f"Не получилось отправить сообщение пользователю {chat_id}")
         await message.answer("Не получилось отрпавить сообщение пользователю. Возможно пользователь заблокировал чат с ботом.")
 
     await state.clear()
