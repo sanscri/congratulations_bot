@@ -51,19 +51,27 @@ async def set_group(session, group_id: int) -> Optional[User]:
 
 
 @connection
-async def set_group(session, group_id: int) -> Optional[User]:
+async def get_thread_id(session, group_id: int) -> int:
     try:
         group = await session.scalar(select(Group).filter_by(group_id=group_id))
-
         if not group:
-            new_group = Group(group_id=group_id)
-            session.add(new_group)
-            await session.commit()
-            logger.info(f"Зарегистрировал  группу с ID {group_id}!")
             return None
         else:
             logger.info(f"Группы с ID {group_id} найденв!")
-            return group
+            return group.thread_id
+
+    except SQLAlchemyError as e:
+        logger.error(f"Ошибка при добавлении группы: {e}")
+        await session.rollback()
+
+@connection
+async def set_thread(session, group_id: int, thread_id: int):
+    try:
+        group = await session.scalar(select(Group).filter_by(group_id=group_id))
+        if group:
+            group.thread_id = thread_id
+            await session.commit()
+
     except SQLAlchemyError as e:
         logger.error(f"Ошибка при добавлении группы: {e}")
         await session.rollback()
