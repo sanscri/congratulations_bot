@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.fsm.state import StatesGroup, State, StateFilter
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message,  InlineKeyboardButton, InlineKeyboardMarkup
@@ -30,7 +30,7 @@ class GroupSendMessasgeStage(StatesGroup):
 
 def send_msg_kb():
     kb_list = [
-        [KeyboardButton(text="👤Выбрать пользователя", request_users=KeyboardButtonRequestUsers(request_id=1, first_name=True, last_name=True, request_username=True))],
+        [KeyboardButton(text="👤Выбрать пользователя", request_users=KeyboardButtonRequestUsers(request_id=1, user_is_bot=False, first_name=True, last_name=True, request_username=True))],
         [KeyboardButton(text="🚫Отмена")],
     ]
     return ReplyKeyboardMarkup(
@@ -96,8 +96,7 @@ async def send_message(callback: CallbackQuery, callback_data: MyCallback, state
     await state.set_state(GroupSendMessasgeStage.select_user)
 
 
-@group_router.message(GroupSendMessasgeStage.select_user)
-@group_router.message(F.user_shared)
+@group_router.message(F.user_shared, GroupSendMessasgeStage.select_user)
 async def handle_user_note_message(message: Message, state: FSMContext):
     await state.update_data(username=message.text)
     await state.update_data(user_id=message.users_shared.users[0].user_id)
@@ -117,7 +116,7 @@ async def handle_user_note_message(message: Message, state: FSMContext):
 
 
 
-@group_router.message(StateFilter(GroupSendMessasgeStage.group_content))
+@group_router.message(GroupSendMessasgeStage.group_content)
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = message.text
