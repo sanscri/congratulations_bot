@@ -132,6 +132,6 @@ async def handle_user_note_message(message: Message, state: FSMContext):
             text=content,
             parse_mode=ParseMode.HTML
         )
-    success_content = "Поздравление отпрравлено"
+    success_content = "Поздравление отправлено"
     await message.answer(success_content, reply_markup=ReplyKeyboardRemove())
     await state.clear()
