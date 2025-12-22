@@ -81,10 +81,10 @@ async def handle_user_note_message(message: Message, state: FSMContext):
         await message.answer(success_content, reply_markup=ReplyKeyboardRemove())
     except TelegramBadRequest:
         logger.error(f"Не получилось отправить сообщение пользователю {chat_id}")
-        await message.answer("Не получилось отрпавить сообщение пользователю. Возможно пользователя нет в боте.",  reply_markup=ReplyKeyboardRemove())
+        await message.answer("Не получилось отправить сообщение пользователю. Возможно пользователя нет в боте.",  reply_markup=ReplyKeyboardRemove())
     except TelegramForbiddenError:
         logger.error(f"Не получилось отправить сообщение пользователю {chat_id}")
-        await message.answer("Не получилось отрпавить сообщение пользователю. Возможно пользователь заблокировал чат с ботом.",  reply_markup=ReplyKeyboardRemove())
+        await message.answer("Не получилось отправить сообщение пользователю. Возможно пользователь заблокировал чат с ботом.",  reply_markup=ReplyKeyboardRemove())
 
     await state.clear()
 
