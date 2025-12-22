@@ -2,13 +2,9 @@ from pstats import Stats
 from create_bot import logger
 from .base import connection
 from .models import Group, User
-from sqlalchemy import inspect, select, update
+from sqlalchemy import select
 from typing import List, Dict, Any, Optional
-from sqlalchemy import func
-from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError
-from uuid import UUID
-
 
 @connection
 async def set_user(session, tg_id: int) -> Optional[User]:
