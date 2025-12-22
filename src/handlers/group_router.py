@@ -11,8 +11,9 @@ from aiogram.types.reply_keyboard_remove import ReplyKeyboardRemove
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, KeyboardButton, KeyboardButtonRequestUsers, ReplyKeyboardMarkup
 from aiogram.enums.parse_mode import ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from database.dao import get_groups, get_thread_id
-from create_bot import bot
+from create_bot import bot, logger
 
 
 group_router = Router()
@@ -65,14 +66,17 @@ async def cmd_group(message: Message, state: FSMContext):
     groups = await get_groups()
     builder = InlineKeyboardBuilder()
     for group in groups:  
-        chat_member = await bot.get_chat_member(chat_id=group['group_id'], user_id=message.chat.id)
-        status = chat_member.status
-        if status == ChatMemberStatus.CREATOR or status == ChatMemberStatus.MEMBER or status == ChatMemberStatus.ADMINISTRATOR:
-            chat = await bot.get_chat(group['group_id'])
-            group_name = chat.title
-            builder.row(InlineKeyboardButton(
-                text=group_name, callback_data=MyCallback(data_name="data_name", data=group['group_id']).pack())
-            )
+        try:
+            chat_member = await bot.get_chat_member(chat_id=group['group_id'], user_id=message.chat.id)
+            status = chat_member.status
+            if status == ChatMemberStatus.CREATOR or status == ChatMemberStatus.MEMBER or status == ChatMemberStatus.ADMINISTRATOR:
+                chat = await bot.get_chat(group['group_id'])
+                group_name = chat.title
+                builder.row(InlineKeyboardButton(
+                    text=group_name, callback_data=MyCallback(data_name="data_name", data=group['group_id']).pack())
+                )
+        except TelegramBadRequest as e:
+            logger.error(f"Ошибка при сопоставлении, если человек в группе или нет: {e}")
     await message.answer(content, reply_markup=builder.as_markup())
     await state.set_state(GroupSendMessasgeStage.select_group)
     
