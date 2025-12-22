@@ -121,10 +121,10 @@ async def handle_user_note_message(message: Message, state: FSMContext):
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = message.text
-    
+    username = data["username"]
     recipient = "не определено"
     if data["username"] != None:
-        recipient = f"@{data["username"]}"
+        recipient = f"@{username}"
 
     content = f"<b>📨Тук-Тук-Тук. Пришлёл почтальон и принёс открытку.</b>\n\n<b>Кому</b>: {recipient}\n<b>Текст открытки</b>\n{congratulation}"
     await bot.send_message(
