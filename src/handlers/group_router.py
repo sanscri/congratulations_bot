@@ -105,7 +105,7 @@ async def handle_user_note_message(message: Message, state: FSMContext):
     await state.update_data(username=message.users_shared.users[0].last_name)
     await state.update_data(username=message.users_shared.users[0].username)
     kb_list = [
-           [KeyboardButton(text="Назад")]
+           [KeyboardButton(text="🚫Отмена")]
     ]
     await message.answer("Введите текст поздравления", reply_markup= ReplyKeyboardMarkup(
         keyboard=kb_list,
