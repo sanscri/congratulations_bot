@@ -22,10 +22,10 @@ class MyCallback(CallbackData, prefix="my"):
     data_name: str
     data: int
 
-class SendMessasgeStage(StatesGroup):
+class GroupSendMessasgeStage(StatesGroup):
     select_group = State() # выбор группы
-    select_user = State()  # Ожидаем любое сообщение от пользователя
-    content = State()  # Юзер пользователя
+    select_user = State() 
+    group_content = State() 
 
 
 def send_msg_kb():
@@ -74,7 +74,7 @@ async def cmd_group(message: Message, state: FSMContext):
                 text=group_name, callback_data=MyCallback(data_name="data_name", data=group['group_id']).pack())
             )
     await message.answer(content, reply_markup=builder.as_markup())
-    await state.set_state(SendMessasgeStage.select_group)
+    await state.set_state(GroupSendMessasgeStage.select_group)
     
 
 @group_router.message(F.text == "🚫Отмена")
@@ -93,10 +93,10 @@ async def send_message(callback: CallbackQuery, callback_data: MyCallback, state
     await state.update_data(thread_id=thread_id)
     content = "Выберите пользователя, которому будет адресована анонимка"
     await callback.message.answer(content, reply_markup=send_msg_kb())
-    await state.set_state(SendMessasgeStage.select_user)
+    await state.set_state(GroupSendMessasgeStage.select_user)
 
 
-@group_router.message(SendMessasgeStage.select_user)
+@group_router.message(GroupSendMessasgeStage.select_user)
 @group_router.message(F.user_shared)
 async def handle_user_note_message(message: Message, state: FSMContext):
     await state.update_data(username=message.text)
@@ -113,11 +113,11 @@ async def handle_user_note_message(message: Message, state: FSMContext):
         one_time_keyboard=True,
         input_field_placeholder="Введите поздравление здесь👇"
     ))
-    await state.set_state(SendMessasgeStage.content)
+    await state.set_state(GroupSendMessasgeStage.group_content)
 
 
 
-@group_router.message(SendMessasgeStage.content)
+@group_router.message(GroupSendMessasgeStage.group_content)
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = message.text
