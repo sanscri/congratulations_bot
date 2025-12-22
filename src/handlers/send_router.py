@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.state import StatesGroup, State, StateFilter
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.types import Message, KeyboardButton, KeyboardButtonRequestUser, ReplyKeyboardMarkup
@@ -67,7 +67,7 @@ async def on_user_shared(message:Message, state: FSMContext):
 
 
 
-@send_router.message(SendMessasgeStage.content)
+@send_router.message(StateFilter(SendMessasgeStage.content))
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = f"📨Вам пришло анонимное поздравление!\n{message.text}"

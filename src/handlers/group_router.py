@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.state import StatesGroup, State, StateFilter
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message,  InlineKeyboardButton, InlineKeyboardMarkup
@@ -117,7 +117,7 @@ async def handle_user_note_message(message: Message, state: FSMContext):
 
 
 
-@group_router.message(GroupSendMessasgeStage.group_content)
+@group_router.message(StateFilter(GroupSendMessasgeStage.group_content))
 async def handle_user_note_message(message: Message, state: FSMContext):
     data = await state.get_data()
     congratulation = message.text
