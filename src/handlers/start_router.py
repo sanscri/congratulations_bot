@@ -96,6 +96,11 @@ async def on_bot_joined_chat(update: ChatMemberUpdated):
         await bot.send_message(chat_id=update.chat.id, text=f"Вы добавили поздравлятора в беседу.\nПожалуйста, сделайте его администратором.")
         logger.info(f"Бот добавлен в чат ID: {update.chat.id}")
         logger.info(f"Тип чата: {update.chat.type}")
+    if update.new_chat_member.user.id == bot.id  and update.new_chat_member.status == "administrator":
+        await set_group(update.chat.id)
+        await bot.send_message(chat_id=update.chat.id, text=f"Вы добавили поздравлятора в беседу.\n")
+        logger.info(f"Бот добавлен в чат ID: {update.chat.id}")
+        logger.info(f"Тип чата: {update.chat.type}")
         
 
 @start_router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=PROMOTED_TRANSITION))
