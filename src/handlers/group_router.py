@@ -11,8 +11,8 @@ from aiogram.types.reply_keyboard_remove import ReplyKeyboardRemove
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, KeyboardButton, KeyboardButtonRequestUsers, ReplyKeyboardMarkup
 from aiogram.enums.parse_mode import ParseMode
-from aiogram.exceptions import TelegramBadRequest
-from database.dao import get_groups, get_thread_id
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
+from database.dao import delete_group, get_groups, get_thread_id
 from create_bot import bot, logger
 
 
@@ -77,6 +77,10 @@ async def cmd_group(message: Message, state: FSMContext):
                 )
         except TelegramBadRequest as e:
             logger.error(f"Ошибка при сопоставлении, если человек в группе или нет: {e}")
+            delete_group(group['group_id'])
+        except TelegramForbiddenError as e:
+            logger.error(f"Ошибка при сопоставлении, если человек в группе или нет: {e}")
+            delete_group(group['group_id'])
     await message.answer(content, reply_markup=builder.as_markup())
     await state.set_state(GroupSendMessasgeStage.select_group)
     
