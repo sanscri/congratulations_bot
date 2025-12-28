@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 from aiogram.filters import Command
+from aiogram.enums.content_type import ContentType
 from aiogram.types import Message, KeyboardButton, KeyboardButtonRequestUser, ReplyKeyboardMarkup
 from aiogram.types.reply_keyboard_remove import ReplyKeyboardRemove
 from aiogram.enums.parse_mode import ParseMode
@@ -57,7 +58,7 @@ async def on_user_shared(message:Message, state: FSMContext):
     kb_list = [
            [KeyboardButton(text="🚫Отмена")]
     ]
-    await message.answer("Введите текст поздравления", reply_markup= ReplyKeyboardMarkup(
+    await message.answer("Введите текст поздравления (до 500 символов)", reply_markup= ReplyKeyboardMarkup(
         keyboard=kb_list,
         resize_keyboard=True,
         one_time_keyboard=True,
@@ -66,16 +67,22 @@ async def on_user_shared(message:Message, state: FSMContext):
     await state.set_state(SendMessasgeStage.content)
 
 
-
-@send_router.message(SendMessasgeStage.content)
+@send_router.message(SendMessasgeStage.content, F.content_type == ContentType.TEXT)
 async def handle_user_note_message(message: Message, state: FSMContext):
+    congratulation = message.text
+    if congratulation and 1 <= len(congratulation) <= 500:
+        await message.reply("Сообщение принято, длина в норме!")
+    elif congratulation:
+        await message.reply("Пожалуйста, отправьте сообщение длиной от 1 до 500 символов.")
+        return
+
     data = await state.get_data()
-    congratulation = f"📨Вам пришло анонимное поздравление!\n{message.text}"
+    content = f"📨Вам пришло анонимное поздравление!\n{message.text}"
     chat_id = data["user_id"]
     try:
         await bot.send_message(
             chat_id=chat_id,
-            text=congratulation,
+            text=content,
             parse_mode=ParseMode.HTML,
             )
         success_content = "Анонимное поздравление отпрвлено"
