@@ -10,6 +10,8 @@ from aiogram.enums.parse_mode import ParseMode
 from create_bot import logger, bot
 from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest
 
+from database.dao import set_user
+
 send_router = Router()
 
 
@@ -34,14 +36,14 @@ def send_msg_kb():
 @send_router.message(Command("send"), F.chat.type.in_({"private"}))
 async def cmd_send(message: Message, state: FSMContext):
     await state.clear()
-
+    user = await set_user(tg_id=message.from_user.id)
     msg = f"<b>Поздравьте с праздником любого человека, даже если его нет в боте!</b>\n\nВыберите пользователя с помощью кнопки ниже и поздравьте его анонимно."
     await message.answer(msg, reply_markup=send_msg_kb(), parse_mode="HTML")
     await state.set_state(SendMessasgeStage.user)
 
 
 @send_router.message(F.text == "🚫Отмена")
-async def cmd_start(message: Message, state: FSMContext):
+async def cmd_cancel(message: Message, state: FSMContext):
     await state.clear()
     greeting = "Отправка сообщения отменена."
     await message.answer(greeting, reply_markup=ReplyKeyboardRemove())
@@ -68,7 +70,7 @@ async def on_user_shared(message:Message, state: FSMContext):
 
 
 @send_router.message(SendMessasgeStage.content, F.content_type == ContentType.TEXT)
-async def handle_user_note_message(message: Message, state: FSMContext):
+async def send_message(message: Message, state: FSMContext):
     congratulation = message.text
     if congratulation and 1 <= len(congratulation) <= 500:
         await message.reply("Сообщение принято, длина в норме!")

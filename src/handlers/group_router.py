@@ -12,7 +12,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, KeyboardButton, KeyboardButtonRequestUsers, ReplyKeyboardMarkup
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
-from database.dao import delete_group, get_groups, get_thread_id
+from database.dao import delete_group, get_groups, get_thread_id, set_user
 from create_bot import bot, logger
 
 
@@ -58,7 +58,7 @@ def group_start_kb():
 @group_router.message(Command("group"), F.chat.type.in_({"private"}))
 async def cmd_group(message: Message, state: FSMContext):
     await state.clear()
-
+    user = await set_user(tg_id=message.from_user.id)
     start_content = "<b>Давайте напишем поздравление участнику вашей группы.</b>"
     await message.answer(start_content, reply_markup=group_start_kb(), parse_mode="HTML")
 
