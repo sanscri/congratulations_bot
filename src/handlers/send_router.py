@@ -60,7 +60,7 @@ async def on_user_shared(message:Message, state: FSMContext):
     kb_list = [
            [KeyboardButton(text="🚫Отмена")]
     ]
-    await message.answer("Введите текст поздравления (до 500 символов)", reply_markup= ReplyKeyboardMarkup(
+    await message.answer("Введите текст поздравления (до 2000 символов)", reply_markup= ReplyKeyboardMarkup(
         keyboard=kb_list,
         resize_keyboard=True,
         one_time_keyboard=True,
@@ -72,10 +72,10 @@ async def on_user_shared(message:Message, state: FSMContext):
 @send_router.message(SendMessasgeStage.content, F.content_type == ContentType.TEXT)
 async def send_message(message: Message, state: FSMContext):
     congratulation = message.text
-    if congratulation and 1 <= len(congratulation) <= 500:
+    if congratulation and 1 <= len(congratulation) <= 2000:
         await message.reply("Сообщение принято, длина в норме!")
     elif congratulation:
-        await message.reply("Пожалуйста, отправьте сообщение длиной от 1 до 500 символов.")
+        await message.reply("Пожалуйста, отправьте сообщение длиной от 1 до 2000 символов.")
         return
 
     data = await state.get_data()
